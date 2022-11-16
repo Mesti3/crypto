@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto", "Crypto\Crypto.csproj", "{57B7FB3C-B21F-41F2-8111-1E725E19AD22}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto", "Crypto\Crypto.csproj", "{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto.Console", "Crypto.Console\Crypto.Console.csproj", "{F36CDEE8-35EC-4522-986C-ADF52B053873}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +13,19 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{57B7FB3C-B21F-41F2-8111-1E725E19AD22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57B7FB3C-B21F-41F2-8111-1E725E19AD22}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57B7FB3C-B21F-41F2-8111-1E725E19AD22}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57B7FB3C-B21F-41F2-8111-1E725E19AD22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C9C81C92-1552-4DBB-ABAB-D412FC513356}
+		SolutionGuid = {70C6F847-B501-4AFC-BD03-810FAAEC9DFB}
 	EndGlobalSection
 EndGlobal
