@@ -1,11 +1,51 @@
 ﻿using Crypto.Model;
 using Crypto.Model.Entities;
+using Crypto.Model.ServiceEntities;
+
 
 namespace Crypto.BinanceControllers
 {
     internal class DummyBinanceController :IBinanceController
     {
-
+        #region "GetActualPrices"
+        public async Task<List<ActualPrice>> GetActualPrices()
+        {
+            Random r = new Random();
+            if (r.Next(5) != 0)
+            {
+                    return GetDummyPrices();
+            }
+            else
+                throw new Exception("GET ACTUAL PRICE", new Exception("Dummy error message"));
+        }
+        public async Task<List<ActualPrice>> GetActualPrices(IEnumerable<string> symbols)
+        {
+            Random r = new Random();
+            if (r.Next(5) != 0)
+            {
+                return GetDummyPrices().Where(x => symbols.ToList().Contains(x.Symbol)).ToList();
+            }
+            else
+                throw new Exception("GET ACTUAL PRICE", new Exception("Dummy error message"));
+        }
+        private List<ActualPrice> GetDummyPrices()
+        {
+            return new List<ActualPrice>()
+                {
+                    new ActualPrice("ETHBTC", 0.07170700M),
+                    new ActualPrice("LTCBTC", 0.00343100M),
+                    new ActualPrice("GASBTC", 0.00012280M),
+                    new ActualPrice("YFIBUSD",6162.00000000M),
+                    new ActualPrice("BALUSDT",5.332M),
+                    new ActualPrice("BNBBTC", 0.016106M),
+                    new ActualPrice("NEOBTC", 0.000399M),
+                    new ActualPrice("QTUMETI", 0.001706M),
+                    new ActualPrice("OAXETH", 0.0001778M),
+                    new ActualPrice("WTCBTC", 0.00001323M),
+                };
+        }
+        #endregion
+        #region "Buy"
         public async Task<Purchase> Buy(string symbol, decimal quantity, decimal price)
         {
             Random r = new Random();
@@ -52,6 +92,9 @@ namespace Crypto.BinanceControllers
                     }
             };
         }
+        #endregion
+
+       
       
     }
 }

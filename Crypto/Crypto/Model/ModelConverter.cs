@@ -1,10 +1,15 @@
 ﻿using Binance.Net.Objects.Models.Spot;
 using Crypto.Model.Entities;
+using Crypto.Model.ServiceEntities;
 
 namespace Crypto.Model
 {
     internal class ModelConverter
     {
+        public ActualPrice BinancePriceToActualPrice(BinancePrice price)
+        {
+            return new ActualPrice(price.Symbol, price.Price);
+        }
         public Purchase BinancePlacedOrderToPurchase(BinancePlacedOrder placedOrder)
         {
             Purchase purchase = new Purchase();

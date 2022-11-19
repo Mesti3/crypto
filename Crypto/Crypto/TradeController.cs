@@ -1,6 +1,7 @@
 ﻿using Crypto.BinanceControllers;
 using Crypto.Model;
 using Crypto.Model.Entities;
+using Crypto.Model.ServiceEntities;
 using Serilog;
 
 namespace Crypto
@@ -15,7 +16,7 @@ namespace Crypto
 
         public TradeController()
         {
-            Initialize();         
+            Initialize();
         }
 
         private void Initialize()
@@ -25,6 +26,62 @@ namespace Crypto
             DBController = Config.GetDBControllerFromConfig();
             Logger = Config.GetLoggerFromConfig();
         }
+
+        #region "GetActualPrices"
+        /// <summary>
+        /// load list of all symbols with actual price
+        /// </summary>
+        /// <returns>loaded prices</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"/>
+        public async Task<List<ActualPrice>> GetActualPrices()
+        {
+            try
+            {
+                return await BinanceController.GetActualPrices();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// get actual price of given symbol in list
+        /// </summary>
+        /// <returns>loaded prices</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"/>
+        public async Task<List<ActualPrice>> GetActualPrices(string symbol)
+        {
+            try
+            {
+                return await BinanceController.GetActualPrices(new string[1] { symbol });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// get actual price of given symbols 
+        /// </summary>
+        /// <returns>loaded prices</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"/>
+        public async Task<List<ActualPrice>> GetActualPrices(IEnumerable<string> symbols)
+        {
+            try
+            {
+                return await BinanceController.GetActualPrices( symbols );
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// buy symbol in given quantity or price
