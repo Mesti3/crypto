@@ -140,6 +140,52 @@ namespace Crypto
                 return totalPrice / actualPrice.Price;
         }
         #endregion
+        #region "Sale"
+        /// <summary>
+        /// sell symbol in given quantity or price
+        /// </summary>
+        /// <param name="symbol">code of good to buy</param>
+        /// <param name="quantity">number of units</param>
+        /// <remarks>either price or quantity must be filled</remarks>
+        /// <returns>created order</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#new-order-trade"/>
+        public async Task<Sale> SellAsync(string symbol, decimal? quantity, decimal? price = null)
+        {
+
+            //no symbol validation - parameters are vaidated in BinanceNet library, PlaceOrderAsync call
+            if (string.IsNullOrWhiteSpace(symbol))
+                throw new ArgumentNullException(nameof(symbol));
+            if (!quantity.HasValue && !price.HasValue)
+                throw new ArgumentNullException("Quantity or price must be filled");
+            if (quantity.HasValue && price.HasValue)
+                throw new ArgumentException("Either quantity or price must be filled");
+            if (quantity.HasValue && quantity.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be more then 0");
+            if (price.HasValue && price.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(price), "Price must be more then 0");
+            try
+            {
+                Sale createdSale;
+                if (!quantity.HasValue)
+                {
+                    quantity = await CalculateQuantity(symbol, price.Value);
+                }
+
+                createdSale = await BinanceController.Sell(symbol, quantity.Value);
+                DBController.SaveSale(createdSale);
+                return createdSale;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+
+        }
+
+      
+
+        #endregion
     }
 
 }

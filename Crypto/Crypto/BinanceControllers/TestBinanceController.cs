@@ -75,6 +75,20 @@ namespace Crypto.BinanceControllers
             }
         }
         #endregion
+        #region "Sell"
+        public async Task<Sale> Sell(string symbol, decimal quantity)
+        {
+            using (var client = new BinanceClient())
+            {
+                var result = await client.SpotApi.Trading.PlaceTestOrderAsync(symbol, OrderSide.Sell, SpotOrderType.Market, quantity: quantity);//, newClientOrderId: ClientOrderId.GetNew(symbol)
+                if (result.Success)
+                    return Converter.BinancePlacedOrderToSale(result.Data);
+                else
+                    throw new Exception("Sell_TEST: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception(result.Error?.Message));
+            }
+        }
+        #endregion
+      
     }
 }
 

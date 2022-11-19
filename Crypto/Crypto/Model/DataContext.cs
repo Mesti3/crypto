@@ -9,7 +9,8 @@ namespace Crypto.Model
         private string ConnectionString;
         public DbSet<Purchase> Purchase { get; set; }
         public DbSet<PurchaseTrade> PurchaseTrade { get; set; }
-
+        public DbSet<Sale> Sale { get; set; }
+        public DbSet<SaleTrade> SaleTrade { get; set; }
         public DataContext(string connectionString) :base ()
         {
             ConnectionString = connectionString;
@@ -42,6 +43,8 @@ namespace Crypto.Model
 
             builder.Entity<PurchaseTrade>()
                 .HasOne(x => x.Purchase).WithMany(x => x.Trades).HasForeignKey(x => x.PurchaseId);
+            builder.Entity<SaleTrade>()
+                .HasOne(x => x.Sale).WithMany(x => x.Trades).HasForeignKey(x => x.SaleId);
 
         }
     }

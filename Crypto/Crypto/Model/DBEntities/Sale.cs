@@ -1,6 +1,7 @@
 ﻿namespace Crypto.Model.Entities
 {
-    internal class Sale
+    public class Sale:Order
     {
+        public List<SaleTrade> Trades { get; set; }
     }
 }

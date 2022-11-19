@@ -15,5 +15,10 @@ namespace Crypto.Model
             Context.Purchase.Add(newPurchase);
             Context.SaveChanges();
         }
+        public void SaveSale (Sale newSale)
+        {
+            Context.Sale.Add(newSale);
+            Context.SaveChanges();
+        }
     }
 }

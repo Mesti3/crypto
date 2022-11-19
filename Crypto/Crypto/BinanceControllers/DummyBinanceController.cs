@@ -107,7 +107,47 @@ namespace Crypto.BinanceControllers
         }
         #endregion
 
-       
-      
+        #region "Sell"
+        public async Task<Sale> Sell(string symbol, decimal quantity)
+        {
+            Random r = new Random();
+            if (r.Next(5) != 0)
+            {
+                return GetDummySale(symbol, quantity, r.Next(1000, 1000000) * 0.01M);
+            }
+            else
+                throw new Exception("Buy_Dummy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception("Dummy error message"));
+
+        }
+
+        private Sale GetDummySale(string symbol, decimal quantity, decimal price)
+        {
+            return new Sale()
+            {
+                ClientOrderId = ClientOrderId.GetNew(symbol),
+                Symbol = symbol,
+                CreateTime = DateTime.Now,
+                Price = price,
+                Quantity = quantity,
+                Trades = new List<SaleTrade>() {
+                        new SaleTrade {
+                            TradeId = 1,
+                             Fee = price * 0.66M * 0.02M,
+                             FeeAsset = "USDT",
+                             Price = price/quantity,
+                             Quantity = quantity*0.66M
+                        },
+                        new SaleTrade {
+                            TradeId = 2,
+                             Fee = price * 0.33M * 0.02M,
+                             FeeAsset = "USDT",
+                             Price = price/quantity,
+                             Quantity = quantity*0.33M
+                        }
+                    }
+            };
+        }
+        #endregion
+
     }
 }

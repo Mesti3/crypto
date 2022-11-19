@@ -33,6 +33,8 @@ namespace Crypto.Console
             SupportedOperations.Add(0, Exit);
             SupportedOperations.Add(1, GetActualPrices);
             SupportedOperations.Add(2, Buy);
+            SupportedOperations.Add(3, Sell);
+            SupportedOperations.Add(4, GetAccountStatus);
         }
         private void WriteOperations()
         {
@@ -80,7 +82,7 @@ namespace Crypto.Console
                 if (!string.IsNullOrWhiteSpace(price))
                     priceValue = decimal.Parse(price);
                 var order = TradeController.BuyAsync(symbol, quantityValue, priceValue).Result;
-                console.WriteLine("created order:");
+                console.WriteLine("created purchase:");
                 console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId,order.Symbol));
                 console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
                 console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x=>x.Quantity), order.Trades.Sum(x=>x.Quantity * x.Price)));
@@ -91,6 +93,40 @@ namespace Crypto.Console
                 console.WriteLine(ex.ToString());
             }
             console.WriteLine();
+        }
+        private void Sell()
+        {
+            try
+            {
+                console.WriteLine("insert symbol");
+                string symbol = console.ReadLine();
+                console.WriteLine("insert quantity");
+                var quantity = console.ReadLine();
+                decimal? quantityValue = null;
+                if (!string.IsNullOrWhiteSpace(quantity))
+                    quantityValue = decimal.Parse(quantity);
+                console.WriteLine("insert total value");
+                var price = console.ReadLine();
+                decimal? priceValue = null;
+                if (!string.IsNullOrWhiteSpace(price))
+                    priceValue = decimal.Parse(price);
+                var order = TradeController.SellAsync(symbol, quantityValue, priceValue).Result;
+                console.WriteLine("created sale:");
+                console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId, order.Symbol));
+                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
+                console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x => x.Quantity), order.Trades.Sum(x => x.Quantity * x.Price)));
+
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
+        }
+        private void GetAccountStatus()
+        {
+
+            //https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
         }
     }
 }
