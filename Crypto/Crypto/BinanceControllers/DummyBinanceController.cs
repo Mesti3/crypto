@@ -8,6 +8,16 @@ namespace Crypto.BinanceControllers
     internal class DummyBinanceController :IBinanceController
     {
         #region "GetActualPrices"
+        public async Task<ActualPrice> GetActualPrice(string symbol)
+        {
+            Random r = new Random();
+            if (r.Next(5) != 0)
+            {
+                return GetDummyPrices().Where(x => x.Symbol==symbol).FirstOrDefault();
+            }
+            else
+                throw new Exception("GetActualPrice_Dummy", new Exception("Dummy error message"));
+        }
         public async Task<List<ActualPrice>> GetActualPrices()
         {
             Random r = new Random();
@@ -16,7 +26,7 @@ namespace Crypto.BinanceControllers
                     return GetDummyPrices();
             }
             else
-                throw new Exception("GET ACTUAL PRICE", new Exception("Dummy error message"));
+                throw new Exception("GetActualPrices_Dummy", new Exception("Dummy error message"));
         }
         public async Task<List<ActualPrice>> GetActualPrices(IEnumerable<string> symbols)
         {
@@ -26,7 +36,7 @@ namespace Crypto.BinanceControllers
                 return GetDummyPrices().Where(x => symbols.ToList().Contains(x.Symbol)).ToList();
             }
             else
-                throw new Exception("GET ACTUAL PRICE", new Exception("Dummy error message"));
+                throw new Exception("GetActualPrices_Dummy", new Exception("Dummy error message"));
         }
         private List<ActualPrice> GetDummyPrices()
         {
@@ -52,16 +62,19 @@ namespace Crypto.BinanceControllers
             if (r.Next(5) != 0)
                 return GetDummyPurchase(symbol, quantity,price);
             else
-                throw new Exception("BUY: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\", \"price\"" + price + "\"}", new Exception("Dummy error message"));
+                throw new Exception("Buy_Dummy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\", \"price\"" + price + "\"}", new Exception("Dummy error message"));
 
         }
         public async Task<Purchase> Buy(string symbol, decimal quantity)
         {
             Random r = new Random();
             if (r.Next(5) != 0)
-                return GetDummyPurchase(symbol, quantity, r.Next(1000,1000000)*0.01M);
+            {
+                var actualPrice = GetDummyPrices().Where(x => x.Symbol == symbol).FirstOrDefault()?.Price ?? r.Next(1000, 1000000) * 0.01M;
+                return GetDummyPurchase(symbol, quantity, actualPrice*quantity);
+            }
             else
-                throw new Exception("BUY: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception("Dummy error message"));
+                throw new Exception("Buy_Dummy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception("Dummy error message"));
             
         }
 

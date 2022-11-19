@@ -29,6 +29,23 @@ namespace Crypto
 
         #region "GetActualPrices"
         /// <summary>
+        /// get actual price of given symbol in list
+        /// </summary>
+        /// <returns>loaded prices</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"/>
+        public async Task<ActualPrice> GetActualPrice(string symbol)
+        {
+            try
+            {
+                return await BinanceController.GetActualPrice(symbol);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+        /// <summary>
         /// load list of all symbols with actual price
         /// </summary>
         /// <returns>loaded prices</returns>
@@ -38,24 +55,6 @@ namespace Crypto
             try
             {
                 return await BinanceController.GetActualPrices();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, ErrorFormatString);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// get actual price of given symbol in list
-        /// </summary>
-        /// <returns>loaded prices</returns>
-        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker"/>
-        public async Task<List<ActualPrice>> GetActualPrices(string symbol)
-        {
-            try
-            {
-                return await BinanceController.GetActualPrices(new string[1] { symbol });
             }
             catch (Exception ex)
             {
@@ -82,38 +81,65 @@ namespace Crypto
             }
         }
         #endregion
-
+        #region "Buy"
         /// <summary>
         /// buy symbol in given quantity or price
         /// </summary>
         /// <param name="symbol">code of good to buy</param>
-        /// <param name="price">price</param>
+        /// <param name="price">total price</param>
         /// <param name="quantity">number of units</param>
         /// <remarks>either price or quantity must be filled</remarks>
         /// <returns>created order</returns>
         /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#new-order-trade"/>
-        public async Task<bool> BuyAsync(string symbol, decimal quantity, decimal? price = null)
+        public async Task<Purchase> BuyAsync(string symbol, decimal? quantity, decimal? price = null)
         {
 
-            //no validation - parameters are vaidated in BinanceNet library, PlaceOrderAsync call
+            //no symbol validation - parameters are vaidated in BinanceNet library, PlaceOrderAsync call
+            if (string.IsNullOrWhiteSpace(symbol))
+                throw new ArgumentNullException(nameof(symbol));
+            if (!quantity.HasValue && !price.HasValue)
+                throw new ArgumentNullException("Quantity or price must be filled");
+            if (quantity.HasValue && price.HasValue)
+                throw new ArgumentException("Either quantity or price must be filled");
+            if (quantity.HasValue && quantity.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity must be more then 0");
+            if (price.HasValue && price.Value <= 0)
+                throw new ArgumentOutOfRangeException(nameof(price),"Price must be more then 0");
             try
             {
                 Purchase createdPurchase;
-                if (price.HasValue && price.Value > 0)
-                    createdPurchase = await BinanceController.Buy(symbol, quantity, price.Value);
-                else
-                    createdPurchase = await BinanceController.Buy(symbol, quantity);
+                if (!quantity.HasValue)
+                {
+                    quantity = await CalculateQuantity(symbol, price.Value);
+                }
+
+                //if (price.HasValue && price.Value > 0) 
+                //    createdPurchase = await BinanceController.Buy(symbol, quantity.Value, price.Value); //buy for current amount and price is not supported
+                //else
+                createdPurchase = await BinanceController.Buy(symbol, quantity.Value);
                 DBController.SavePurchase(createdPurchase);
-                return true;
+                return createdPurchase;
             }
             catch (Exception ex)
             {
                 Logger.Error(ex, ErrorFormatString);
-                return false;
+                throw;
             }
 
         }
+        
 
+        private async Task<decimal> CalculateQuantity(string symbol, decimal totalPrice)
+        {
+            var actualPrice = await GetActualPrice(symbol);
+            if (actualPrice == null)
+                throw new ArgumentOutOfRangeException(nameof(symbol));
+            else if (actualPrice.Price == 0)
+                throw new ArgumentOutOfRangeException(string.Format("{0} - Actual unit value for {1} is 0", nameof(symbol), symbol));
+            else
+                return totalPrice / actualPrice.Price;
+        }
+        #endregion
     }
 
 }

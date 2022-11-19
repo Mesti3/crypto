@@ -70,20 +70,25 @@ namespace Crypto.Console
                 console.WriteLine("insert symbol");
                 string symbol = console.ReadLine();
                 console.WriteLine("insert quantity");
-                decimal quantity = decimal.Parse(console.ReadLine());
-                console.WriteLine("insert value");
+                var quantity =console.ReadLine();
+                decimal? quantityValue = null;
+                if (!string.IsNullOrWhiteSpace(quantity))
+                    quantityValue = decimal.Parse(quantity);
+                console.WriteLine("insert total value");
                 var price = console.ReadLine();
                 decimal? priceValue = null;
                 if (!string.IsNullOrWhiteSpace(price))
                     priceValue = decimal.Parse(price);
-                if (TradeController.BuyAsync(symbol, quantity, priceValue).Result)
-                    console.WriteLine("order created");
-                else
-                    console.WriteLine("error");
+                var order = TradeController.BuyAsync(symbol, quantityValue, priceValue).Result;
+                console.WriteLine("created order:");
+                console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId,order.Symbol));
+                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
+                console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x=>x.Quantity), order.Trades.Sum(x=>x.Quantity * x.Price)));
+
             }
             catch (Exception ex)
             {
-                console.WriteLine(ex.ToString);
+                console.WriteLine(ex.ToString());
             }
             console.WriteLine();
         }

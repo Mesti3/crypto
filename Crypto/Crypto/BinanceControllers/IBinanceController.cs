@@ -5,6 +5,7 @@ namespace Crypto.BinanceControllers
 {
     internal interface IBinanceController
     {
+        public Task<ActualPrice> GetActualPrice(string symbol);
         public Task<List<ActualPrice>> GetActualPrices();
         public Task<List<ActualPrice>> GetActualPrices(IEnumerable<string> symbols);
         public Task<Purchase> Buy(string symbol, decimal quantity);

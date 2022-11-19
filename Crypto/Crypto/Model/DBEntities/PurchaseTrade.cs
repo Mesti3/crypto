@@ -1,6 +1,6 @@
 ﻿namespace Crypto.Model.Entities
 {
-    internal class PurchaseTrade
+    public class PurchaseTrade
     {
         public int Id { get; set; }
         public decimal Price { get; set; }

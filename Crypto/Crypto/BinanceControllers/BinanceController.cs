@@ -14,6 +14,18 @@ namespace Crypto.BinanceControllers
             Converter = convertor;
         }
         #region "GetActualPrices"
+        public async Task<ActualPrice> GetActualPrice(string symbol)
+        {
+            using (var client = new BinanceClient())
+            {
+                var result = await client.SpotApi.ExchangeData.GetPriceAsync(symbol);
+                if (result.Success)
+                    return Converter.BinancePriceToActualPrice(result.Data);
+                else
+                    throw new Exception("GetActualPrice", new Exception(result.Error?.Message));
+            }
+        }
+
         public async Task<List<ActualPrice>> GetActualPrices()
         {
             using (var client = new BinanceClient())
@@ -47,7 +59,7 @@ namespace Crypto.BinanceControllers
                 if (result.Success)
                     return Converter.BinancePlacedOrderToPurchase(result.Data);
                 else
-                    throw new Exception("BUY: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\", \"price\"" + price + "\"}", new Exception(result.Error?.Message));
+                    throw new Exception("Buy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\", \"price\"" + price + "\"}", new Exception(result.Error?.Message));
             }
         }
         public async Task<Purchase> Buy(string symbol, decimal quantity)
@@ -58,7 +70,7 @@ namespace Crypto.BinanceControllers
                 if (result.Success)
                     return Converter.BinancePlacedOrderToPurchase(result.Data);
                 else
-                    throw new Exception("BUY: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception(result.Error?.Message));
+                    throw new Exception("Buy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception(result.Error?.Message));
             }
         }
         #endregion
