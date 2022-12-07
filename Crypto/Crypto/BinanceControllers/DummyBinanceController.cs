@@ -5,7 +5,7 @@ using Crypto.Model.ServiceEntities;
 
 namespace Crypto.BinanceControllers
 {
-    internal class DummyBinanceController :IBinanceController
+    internal class DummyBinanceController : IBinanceController
     {
         #region "GetActualPrices"
         public async Task<ActualPrice> GetActualPrice(string symbol)
@@ -13,7 +13,7 @@ namespace Crypto.BinanceControllers
             Random r = new Random();
             if (r.Next(5) != 0)
             {
-                return GetDummyPrices().Where(x => x.Symbol==symbol).FirstOrDefault();
+                return GetDummyPrices().Where(x => x.Symbol == symbol).FirstOrDefault();
             }
             else
                 throw new Exception("GetActualPrice_Dummy", new Exception("Dummy error message"));
@@ -23,7 +23,7 @@ namespace Crypto.BinanceControllers
             Random r = new Random();
             if (r.Next(5) != 0)
             {
-                    return GetDummyPrices();
+                return GetDummyPrices();
             }
             else
                 throw new Exception("GetActualPrices_Dummy", new Exception("Dummy error message"));
@@ -60,7 +60,7 @@ namespace Crypto.BinanceControllers
         {
             Random r = new Random();
             if (r.Next(5) != 0)
-                return GetDummyPurchase(symbol, quantity,price);
+                return GetDummyPurchase(symbol, quantity, price);
             else
                 throw new Exception("Buy_Dummy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\", \"price\"" + price + "\"}", new Exception("Dummy error message"));
 
@@ -71,11 +71,11 @@ namespace Crypto.BinanceControllers
             if (r.Next(5) != 0)
             {
                 var actualPrice = GetDummyPrices().Where(x => x.Symbol == symbol).FirstOrDefault()?.Price ?? r.Next(1000, 1000000) * 0.01M;
-                return GetDummyPurchase(symbol, quantity, actualPrice*quantity);
+                return GetDummyPurchase(symbol, quantity, actualPrice * quantity);
             }
             else
                 throw new Exception("Buy_Dummy: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception("Dummy error message"));
-            
+
         }
 
         private Purchase GetDummyPurchase(string symbol, decimal quantity, decimal price)
@@ -85,7 +85,8 @@ namespace Crypto.BinanceControllers
                 ClientOrderId = ClientOrderId.GetNew(symbol),
                 Symbol = symbol,
                 CreateTime = DateTime.Now,
-                Price = price,
+                TotalPrice = price,
+                UnitPrice = price = price / quantity,
                 Quantity = quantity,
                 Trades = new List<PurchaseTrade>() {
                         new PurchaseTrade {
@@ -127,7 +128,8 @@ namespace Crypto.BinanceControllers
                 ClientOrderId = ClientOrderId.GetNew(symbol),
                 Symbol = symbol,
                 CreateTime = DateTime.Now,
-                Price = price,
+                TotalPrice = price,
+                UnitPrice = price = price / quantity,
                 Quantity = quantity,
                 Trades = new List<SaleTrade>() {
                         new SaleTrade {
@@ -146,6 +148,36 @@ namespace Crypto.BinanceControllers
                         }
                     }
             };
+        }
+
+        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> DoSomething(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OrderProfit> GetOrder(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<OrderProfit>> GetOrders(string symbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SymbolSetting> GetSymbolSetting(string symbol)
+        {
+            throw new NotImplementedException();
         }
         #endregion
 

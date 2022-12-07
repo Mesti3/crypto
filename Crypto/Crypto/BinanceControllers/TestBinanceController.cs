@@ -1,17 +1,20 @@
 ﻿using Binance.Net.Clients;
 using Binance.Net.Enums;
+using Binance.Net.Objects;
 using Crypto.Model;
 using Crypto.Model.Entities;
 using Crypto.Model.ServiceEntities;
+using CryptoExchange.Net.Authentication;
 
 namespace Crypto.BinanceControllers
 {
     internal class TestBinanceController : IBinanceController
     {
         private ModelConverter Converter;
-        public TestBinanceController(ModelConverter convertor)
+        public TestBinanceController(ModelConverter convertor, string apiKey, string apiSecret)
         {
             Converter = convertor;
+            BinanceClient.SetDefaultOptions(new BinanceClientOptions() { ApiCredentials = new ApiCredentials(apiKey, apiSecret) });
         }
 
         #region "GetActualPrices"
@@ -33,7 +36,7 @@ namespace Crypto.BinanceControllers
             {
                 var result = await client.SpotApi.ExchangeData.GetPricesAsync();
                 if (result.Success)
-                    return result.Data.Select(x=>Converter.BinancePriceToActualPrice(x)).ToList();
+                    return result.Data.Select(x => Converter.BinancePriceToActualPrice(x)).ToList();
                 else
                     throw new Exception("GetActualPrice_TEST", new Exception(result.Error?.Message));
             }
@@ -87,8 +90,39 @@ namespace Crypto.BinanceControllers
                     throw new Exception("Sell_TEST: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception(result.Error?.Message));
             }
         }
+
+
+        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<object> DoSomething(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<OrderProfit> GetOrder(string symbol, long orderId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<OrderProfit>> GetOrders(string symbol)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SymbolSetting> GetSymbolSetting(string symbol)
+        {
+            throw new NotImplementedException();
+        }
         #endregion
-      
+
     }
 }
 

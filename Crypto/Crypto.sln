@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto", "Crypto\Crypto.csproj", "{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crypto", "Crypto\Crypto.csproj", "{71276BA5-5DCB-4F63-9A86-BC7ACF42AF88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Crypto.Console", "Crypto.Console\Crypto.Console.csproj", "{F36CDEE8-35EC-4522-986C-ADF52B053873}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Crypto.Console", "Crypto.Console\Crypto.Console.csproj", "{F36CDEE8-35EC-4522-986C-ADF52B053873}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Binance.Net", "..\Binance.Net\Binance.Net.csproj", "{EB5C3C76-0D26-4E70-A938-ADD506B7839D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F36CDEE8-35EC-4522-986C-ADF52B053873}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB5C3C76-0D26-4E70-A938-ADD506B7839D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB5C3C76-0D26-4E70-A938-ADD506B7839D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB5C3C76-0D26-4E70-A938-ADD506B7839D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB5C3C76-0D26-4E70-A938-ADD506B7839D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

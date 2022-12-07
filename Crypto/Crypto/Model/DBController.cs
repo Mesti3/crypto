@@ -20,5 +20,10 @@ namespace Crypto.Model
             Context.Sale.Add(newSale);
             Context.SaveChanges();
         }
+        public List<Purchase> LoadPurchases()
+        {
+            return Context.Purchase.Where(x=>x.SaleDate == null).ToList();
+            
+        }
     }
 }

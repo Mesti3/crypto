@@ -35,6 +35,9 @@ namespace Crypto.Console
             SupportedOperations.Add(2, Buy);
             SupportedOperations.Add(3, Sell);
             SupportedOperations.Add(4, GetAccountStatus);
+            SupportedOperations.Add(5, GetDbOrdersProfit);
+            SupportedOperations.Add(6, GetAllOpenOrdersProfit);
+            SupportedOperations.Add(99, DoSomething);
         }
         private void WriteOperations()
         {
@@ -84,7 +87,7 @@ namespace Crypto.Console
                 var order = TradeController.BuyAsync(symbol, quantityValue, priceValue).Result;
                 console.WriteLine("created purchase:");
                 console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId,order.Symbol));
-                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
+                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.TotalPrice));
                 console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x=>x.Quantity), order.Trades.Sum(x=>x.Quantity * x.Price)));
 
             }
@@ -113,7 +116,7 @@ namespace Crypto.Console
                 var order = TradeController.SellAsync(symbol, quantityValue, priceValue).Result;
                 console.WriteLine("created sale:");
                 console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId, order.Symbol));
-                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
+                console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.TotalPrice));
                 console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x => x.Quantity), order.Trades.Sum(x => x.Quantity * x.Price)));
 
             }
@@ -128,5 +131,67 @@ namespace Crypto.Console
 
             //https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
         }
+        private void GetDbOrdersProfit()
+        {
+            try
+            {
+                var orders = TradeController.GetDBOrdersProfit().Result;
+                foreach (var order in orders)
+                {
+                    console.WriteLine(String.Format("id: {0}\tsymbol: {1:F5}\tcreated:{2}\tunitprice:{3:F5}\tth.unitprice:{4:F5}\tprice:{5:F5}\tth.price:{6:F5}\tprofit:{7:F5}\tprofit%:{8:P5}", order.ExternalOrderId, order.Symbol, order.CreateTime, order.UnitPrice, order.ActualUnitPrice, order.TotalPrice, order.TheoreticalPrice, order.Profit, order.ProfitRatio));
+                }
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
+        }
+        private void GetAllOpenOrdersProfit()
+        {
+            try
+            {
+                console.WriteLine("insert symbol");
+                string symbol = console.ReadLine();
+                var orders = TradeController.GetAllOrdersProfit(symbol).Result;
+                
+
+                console.WriteLine("profit:");
+                foreach (var order in orders)
+                {
+                    console.WriteLine(String.Format("id: {0}\tsymbol: {1:F5}\tcreated:{2}\tunitprice:{3:F5}\tth.unitprice:{4:F5}\tprice:{5:F5}\tth.price:{6:F5}\tprofit:{7:F5}\tprofit%:{8:P5}", order.ClientOrderId, order.Symbol, order.CreateTime,order.UnitPrice, order.ActualUnitPrice, order.TotalPrice, order.TheoreticalPrice, order.Profit, order.ProfitRatio));
+                }
+                //console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId, order.Symbol));
+                //console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
+                //console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x => x.Quantity), order.Trades.Sum(x => x.Quantity * x.Price)));
+
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
+        }
+
+        private void DoSomething()
+        {
+            try
+            {
+                TradeController.DoSomethingAsync("ETHBTC",0);
+
+
+                console.WriteLine("done:");
+        
+               
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
+        }
+
     }
 }
+//api-key: PtQO1VvdQUKPxJ6qe2yZruTLjoBvqc8EszVlEIhUUHyGpF3Z924riwqxJVS5t5yi
+//secret-key: CXZohJ2jOUln1U9ZZcqft5Kt9jzbsuWcsAI2mn6E4EABBEW4qRuh82p4eK5BzmQy

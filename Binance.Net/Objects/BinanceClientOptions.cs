@@ -21,7 +21,7 @@ namespace Binance.Net.Objects
         /// <summary>
         /// The default receive window for requests
         /// </summary>
-        public TimeSpan ReceiveWindow { get; set; } = TimeSpan.FromSeconds(5);
+        public  TimeSpan ReceiveWindow { get; set; } = TimeSpan.FromSeconds(5);
 
         private BinanceApiClientOptions _spotApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.Default.RestClientAddress)
         {
@@ -43,7 +43,7 @@ namespace Binance.Net.Objects
             set => _spotApiOptions = new BinanceApiClientOptions(_spotApiOptions, value);
         }
 
-        private BinanceApiClientOptions _usdFuturesApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.Default.UsdFuturesRestClientAddress!)
+        protected  BinanceApiClientOptions _usdFuturesApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.Default.UsdFuturesRestClientAddress!)
         {
             AutoTimestamp = true
         };
@@ -93,6 +93,87 @@ namespace Binance.Net.Objects
         }
     }
 
+    public class BinanceTestClientOptions : BinanceClientOptions
+    {
+        /// <summary>
+        /// Default options for the spot client
+        /// </summary>
+        public static new BinanceClientOptions Default { get; set; } = new BinanceTestClientOptions();
+
+        /// <summary>
+        /// The default receive window for requests
+        /// </summary>
+        public new TimeSpan ReceiveWindow { get; set; } = TimeSpan.FromSeconds(5);
+
+        private new BinanceApiClientOptions _spotApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.TestNet.RestClientAddress)
+        {
+            AutoTimestamp = true,
+            RateLimiters = new List<IRateLimiter>
+                {
+                    new RateLimiter()
+                        .AddPartialEndpointLimit("/api/", 1200, TimeSpan.FromMinutes(1))
+                        .AddPartialEndpointLimit("/sapi/", 12000, TimeSpan.FromMinutes(1))
+                        .AddEndpointLimit("/api/v3/order", 50, TimeSpan.FromSeconds(10), HttpMethod.Post, true)
+                }
+        };
+        /// <summary>
+        /// Spot API options
+        /// </summary>
+        public new BinanceApiClientOptions SpotApiOptions
+        {
+            get => _spotApiOptions;
+            set => _spotApiOptions = new BinanceApiClientOptions(_spotApiOptions, value);
+        }
+
+        protected BinanceApiClientOptions _usdFuturesApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.TestNet.UsdFuturesRestClientAddress!)
+        {
+            AutoTimestamp = true
+        };
+        /// <summary>
+        /// Usd futures API options
+        /// </summary>
+        public BinanceApiClientOptions UsdFuturesApiOptions
+        {
+            get => _usdFuturesApiOptions;
+            set => _usdFuturesApiOptions = new BinanceApiClientOptions(_usdFuturesApiOptions, value);
+        }
+
+        private BinanceApiClientOptions _coinFuturesApiOptions = new BinanceApiClientOptions(BinanceApiAddresses.TestNet.CoinFuturesRestClientAddress!)
+        {
+            AutoTimestamp = true
+        };
+        /// <summary>
+        /// Coin futures API options
+        /// </summary>
+        public BinanceApiClientOptions CoinFuturesApiOptions
+        {
+            get => _coinFuturesApiOptions;
+            set => _coinFuturesApiOptions = new BinanceApiClientOptions(_coinFuturesApiOptions, value);
+        }
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        public BinanceTestClientOptions() : this(Default)
+        {
+        }
+
+        /// <summary>
+        /// ctor
+        /// </summary>
+        /// <param name="baseOn">Base the new options on other options</param>
+        internal BinanceTestClientOptions(BinanceClientOptions baseOn) : base(baseOn)
+        {
+            if (baseOn == null)
+                return;
+
+            ReceiveWindow = baseOn.ReceiveWindow;
+
+            _spotApiOptions = new BinanceApiClientOptions(baseOn.SpotApiOptions, null);
+            _usdFuturesApiOptions = new BinanceApiClientOptions(baseOn.UsdFuturesApiOptions, null);
+            _coinFuturesApiOptions = new BinanceApiClientOptions(baseOn.CoinFuturesApiOptions, null);
+        }
+    }
     /// <summary>
     /// Binance socket client options
     /// </summary>

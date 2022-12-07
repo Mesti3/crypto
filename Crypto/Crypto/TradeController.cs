@@ -13,6 +13,7 @@ namespace Crypto
         private DBController DBController;
         private ILogger Logger;
         private string ErrorFormatString = "{Timestamp} [{Level}] {Message}{NewLine}{Exception}";
+        private Dictionary<string, SymbolSetting> SymbolSettings;
 
         public TradeController()
         {
@@ -22,11 +23,31 @@ namespace Crypto
         private void Initialize()
         {
             var Config = new ConfigReader();
-            BinanceController = Config.GetBinanceReaderFromConfig();
+            BinanceController = Config.GetBinanceControllerFromConfig();
             DBController = Config.GetDBControllerFromConfig();
             Logger = Config.GetLoggerFromConfig();
+            SymbolSettings = new Dictionary<string, SymbolSetting>();
         }
 
+        #region "GetSymbolsSetting"
+        /// <summary>
+        /// get actual price of given symbol in list
+        /// </summary>
+        /// <returns>loaded prices</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#exchange-information"/>
+        public async Task<SymbolSetting> GetSymbolSetting(string symbol)
+        {
+            try
+            {
+                return await BinanceController.GetSymbolSetting(symbol);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+        #endregion
         #region "GetActualPrices"
         /// <summary>
         /// get actual price of given symbol in list
@@ -87,7 +108,7 @@ namespace Crypto
         /// </summary>
         /// <param name="symbol">code of good to buy</param>
         /// <param name="price">total price</param>
-        /// <param name="quantity">number of units</param>
+        /// <param name="quantity">number of units, up to 6 decimal places</param>
         /// <remarks>either price or quantity must be filled</remarks>
         /// <returns>created order</returns>
         /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#new-order-trade"/>
@@ -110,13 +131,14 @@ namespace Crypto
                 Purchase createdPurchase;
                 if (!quantity.HasValue)
                 {
-                    quantity = await CalculateQuantity(symbol, price.Value);
+                    quantity = await CalculateQuantity(symbol, price!.Value);
                 }
-
+                var setting = await LoadSymbolSetting(symbol);
+                quantity = setting.GetValidQuantity(quantity.Value);
                 //if (price.HasValue && price.Value > 0) 
                 //    createdPurchase = await BinanceController.Buy(symbol, quantity.Value, price.Value); //buy for current amount and price is not supported
                 //else
-                createdPurchase = await BinanceController.Buy(symbol, quantity.Value);
+                createdPurchase = await BinanceController.Buy(symbol,quantity.Value);
                 DBController.SavePurchase(createdPurchase);
                 return createdPurchase;
             }
@@ -127,7 +149,6 @@ namespace Crypto
             }
 
         }
-        
 
         private async Task<decimal> CalculateQuantity(string symbol, decimal totalPrice)
         {
@@ -136,9 +157,29 @@ namespace Crypto
                 throw new ArgumentOutOfRangeException(nameof(symbol));
             else if (actualPrice.Price == 0)
                 throw new ArgumentOutOfRangeException(string.Format("{0} - Actual unit value for {1} is 0", nameof(symbol), symbol));
-            else
-                return totalPrice / actualPrice.Price;
+            else            
+                return  totalPrice / actualPrice.Price;
+            
         }
+        private async Task<SymbolSetting> LoadSymbolSetting(string symbol)
+        {
+            if (string.IsNullOrWhiteSpace(symbol))
+                throw new ArgumentNullException(nameof(symbol));
+            if(SymbolSettings.ContainsKey(symbol))
+                return SymbolSettings[symbol];
+            else
+            {
+                var setting = GetSymbolSetting(symbol).Result;
+                if (setting != null)
+                {
+                    SymbolSettings.Add(symbol, setting);
+                    return setting;
+                }
+                else
+                    throw new ArgumentNullException(nameof(symbol), "setting for " + symbol + " not found");
+            }
+        }
+
         #endregion
         #region "Sale"
         /// <summary>
@@ -168,9 +209,9 @@ namespace Crypto
                 Sale createdSale;
                 if (!quantity.HasValue)
                 {
-                    quantity = await CalculateQuantity(symbol, price.Value);
+                    quantity = await CalculateQuantity(symbol, price!.Value);
                 }
-
+                
                 createdSale = await BinanceController.Sell(symbol, quantity.Value);
                 DBController.SaveSale(createdSale);
                 return createdSale;
@@ -183,8 +224,78 @@ namespace Crypto
 
         }
 
-      
+        #endregion
 
+        #region "Profit"
+        /// <summary>
+        /// sell symbol in given quantity or price
+        /// </summary>
+        /// <param name="symbol">code of good to buy</param>
+        /// <remark>profit info is calculated additionally by us</remark>
+        /// <returns>created order</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#curent-open-orders-user_data"/>
+        public async Task<List<OrderProfit>> GetAllOrdersProfit(string symbol)
+        {                    
+            try
+            {
+                if (string.IsNullOrWhiteSpace(symbol))
+                    throw new ArgumentNullException(nameof(symbol));
+                var createdSale = await BinanceController.GetOrders(symbol);
+                var price = await GetActualPrice(symbol);
+                createdSale.ForEach(x => x.ActualUnitPrice = price.Price);
+                return createdSale;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+
+        }
+        /// <summary>
+        /// sell symbol in given quantity or price
+        /// </summary>
+        /// <param name="symbol">code of good to buy</param>
+        /// <remark>profit info is calculated additionally by us</remark>
+        /// <returns>created order</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#curent-open-orders-user_data"/>
+        public async Task<List<OrderProfit>> GetDBOrdersProfit()
+        {
+            try
+            {
+                var purchases = DBController.LoadPurchases().Select(x=>new OrderProfit(x)).ToList();
+                var actualPrices = await GetActualPrices(purchases.Select(x => x.Symbol).Distinct());
+
+                purchases.ForEach(x => x.ActualUnitPrice = actualPrices.FirstOrDefault(y => y.Symbol == x.Symbol)?.Price);
+                return purchases;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+
+        }
+
+        #endregion
+
+        #region "test"
+        public async void DoSomethingAsync(string symbol, decimal? currentUnitPrice = null)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(symbol))
+                    throw new ArgumentNullException(nameof(symbol));
+                var createdSale = await BinanceController.DoSomething(symbol,0);
+               
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+
+        }
         #endregion
     }
 

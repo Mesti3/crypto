@@ -2,10 +2,13 @@ CREATE TABLE Purchase
 (
     Id serial NOT NULL  ,
     Symbol varchar(30) NOT NULL,
+	ExternalOrderId BIGINT NULL,
     ClientOrderId varchar(50) NULL,
-    Price decimal (14,4) NULL,
+    UnitPrice decimal (14,4) NULL,
+    TotalPrice decimal (14,4) NULL,
 	Quantity decimal (20,10) NULL, 
-    CreateTime timestamp without time zone NULL,
+    CreateTime timestamp without time zone NOT NULL CONSTRAINT DF_Flyer_Timestamp DEFAULT (now())::timestamp without time zone,
+    SaleDate  timestamp without time zone NULL,
     CONSTRAINT PK_Purchase PRIMARY KEY (Id)    
 );
 CREATE TABLE PurchaseTrade

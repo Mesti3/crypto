@@ -11,5 +11,10 @@ namespace Crypto.BinanceControllers
         public Task<Purchase> Buy(string symbol, decimal quantity);
         public Task<Purchase> Buy(string symbol, decimal quantity, decimal price);
         public Task<Sale> Sell(string symbol, decimal quantity);
+        public Task<OrderProfit> GetOrder(string symbol, long orderId);
+        public Task<List<OrderProfit>> GetOrders(string symbol);
+
+        public Task<object> DoSomething(string symbol, long orderId);
+        public Task<SymbolSetting> GetSymbolSetting(string symbol);
     }
 }
