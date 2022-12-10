@@ -33,10 +33,11 @@ namespace Crypto.Console
             SupportedOperations.Add(0, Exit);
             SupportedOperations.Add(1, GetActualPrices);
             SupportedOperations.Add(2, Buy);
-            SupportedOperations.Add(3, Sell);
-            SupportedOperations.Add(4, GetAccountStatus);
+            SupportedOperations.Add(3, Sell);         
             SupportedOperations.Add(5, GetDbOrdersProfit);
             SupportedOperations.Add(6, GetAllOpenOrdersProfit);
+            SupportedOperations.Add(7, GetWalletStatus);
+            SupportedOperations.Add(8, GetAssets);
             SupportedOperations.Add(99, DoSomething);
         }
         private void WriteOperations()
@@ -126,11 +127,7 @@ namespace Crypto.Console
             }
             console.WriteLine();
         }
-        private void GetAccountStatus()
-        {
-
-            //https://binance-docs.github.io/apidocs/spot/en/#account-information-user_data
-        }
+      
         private void GetDbOrdersProfit()
         {
             try
@@ -161,10 +158,7 @@ namespace Crypto.Console
                 {
                     console.WriteLine(String.Format("id: {0}\tsymbol: {1:F5}\tcreated:{2}\tunitprice:{3:F5}\tth.unitprice:{4:F5}\tprice:{5:F5}\tth.price:{6:F5}\tprofit:{7:F5}\tprofit%:{8:P5}", order.ClientOrderId, order.Symbol, order.CreateTime,order.UnitPrice, order.ActualUnitPrice, order.TotalPrice, order.TheoreticalPrice, order.Profit, order.ProfitRatio));
                 }
-                //console.WriteLine(String.Format("id: {0}\tsymbol: {1}", order.ClientOrderId, order.Symbol));
-                //console.WriteLine(String.Format("quantity: {0}\tprice:{1}", order.Quantity, order.Price));
-                //console.WriteLine(String.Format("trade quantity: {0}\ttrade price:{1}", order.Trades.Sum(x => x.Quantity), order.Trades.Sum(x => x.Quantity * x.Price)));
-
+               
             }
             catch (Exception ex)
             {
@@ -172,7 +166,34 @@ namespace Crypto.Console
             }
             console.WriteLine();
         }
+        private void GetWalletStatus()
+        {
+            try
+            {
+                var asset = TradeController.GetWalletStatusAsync().Result;
+                console.WriteLine(String.Format("symbol: {0}\tavailable:{1:F5}\ttotal:{2:F5}", asset.Symbol, asset.Available, asset.Total));
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
 
+        }
+        private void GetAssets()
+        {
+            try
+            {
+                var assets = TradeController.GetAssetsAsync().Result;
+                assets.ForEach(asset => console.WriteLine(String.Format("symbol: {0}\tavailable:{1:F5}\ttotal:{2:F5}", asset.Symbol, asset.Available, asset.Total)));
+            }
+            catch (Exception ex)
+            {
+                console.WriteLine(ex.ToString());
+            }
+            console.WriteLine();
+
+        }
         private void DoSomething()
         {
             try

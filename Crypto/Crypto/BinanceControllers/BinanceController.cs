@@ -89,33 +89,77 @@ namespace Crypto.BinanceControllers
                     throw new Exception("Sell: {\"symbol\":\"" + symbol + "\", \"quantity\":\"" + quantity + "\"}", new Exception(result.Error?.Message));
             }
         }
+        #endregion
 
-        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol)
+        #region "GetOrders"
+        public async Task<OrderProfit> GetOrder(string symbol, long orderId)
         {
-            throw new NotImplementedException();
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.Trading.GetOrdersAsync(symbol, orderId);
+                if (result.Success)
+                    if (result.Data.Any())
+                        return Converter.BinanceOrderToOrderProfit(result.Data.First());
+                    else
+                        throw new Exception("GetAllOpenOrders: {\"symbol\":\"" + symbol + "\", \"orderId\":\"" + orderId + "\"}", new Exception("Order not found"));
+                else
+                    throw new Exception("GetAllOpenOrders: {\"symbol\":\"" + symbol + "\", \"orderId\":\"" + orderId + "\"}", new Exception(result.Error?.Message));
+            }
         }
-
-        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol, long orderId)
+        public async Task<List<OrderProfit>> GetOrders(string symbol)
         {
-            throw new NotImplementedException();
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.Trading.GetOrdersAsync(symbol);
+                if (result.Success)
+                    return result.Data.Where(x => x.Side == OrderSide.Buy).Select(x => Converter.BinanceOrderToOrderProfit(x)).ToList();
+                else
+                    throw new Exception("GetAllOpenOrders: {\"symbol\":\"" + symbol + "\"}", new Exception(result.Error?.Message));
+            }
         }
-
-        public Task<object> DoSomething(string symbol, long orderId)
+        #endregion
+        #region "Settings"
+        public async Task<SymbolSetting> GetSymbolSetting(string symbol)
         {
-            throw new NotImplementedException();
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.ExchangeData.GetExchangeInfoAsync(symbol);
+                if (result.Success)
+                    if (result.Data.Symbols.Any())
+                        return Converter.BinanceSymbolToSymbolSetting(result.Data.Symbols.First());
+                    else
+                        throw new Exception("GetSymbolSetting: {\"symbol\":\"" + symbol + "\"}", new Exception("Symbol setting not found"));
+                else
+                    throw new Exception("GetSymbolSetting: {\"symbol\":\"" + symbol + "\"}", new Exception(result.Error?.Message));
+            }
         }
-
-        public Task<OrderProfit> GetOrder(string symbol, long orderId)
+        #endregion
+        #region "Account"
+        public async Task<Asset> GetWalletStatus()
         {
-            throw new NotImplementedException();
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.Account.GetBalancesAsync("EUR");
+                if (result.Success)
+                    return Converter.BinanceUserBalanceToAsset(result.Data.First());
+                else
+                    throw new Exception("GetWalletStatus: {}", new Exception(result.Error?.Message));
+            }
         }
-
-        public Task<List<OrderProfit>> GetOrders(string symbol)
+        public async Task<List<Asset>> GetAssets()
         {
-            throw new NotImplementedException();
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.Account.GetBalancesAsync();
+                if (result.Success)
+                    return result.Data.Select(x => Converter.BinanceUserBalanceToAsset(x)).ToList();
+                else
+                    throw new Exception("GetAssets: {}", new Exception(result.Error?.Message));
+            }
         }
-
-        public Task<SymbolSetting> GetSymbolSetting(string symbol)
+        #endregion
+        #region "Other"
+        public async Task<object> DoSomething(string symbol, long orderId)
         {
             throw new NotImplementedException();
         }

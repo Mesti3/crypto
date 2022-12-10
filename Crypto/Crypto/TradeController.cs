@@ -278,7 +278,44 @@ namespace Crypto
         }
 
         #endregion
+        #region "account"
+        /// <summary>
+        /// get available EUR (USD in test environment) value
+        /// </summary>
+        /// <returns>value</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#user-asset-user_data"/>
 
+        public async Task<Asset> GetWalletStatusAsync()
+        {
+            try
+            {
+                return await BinanceController.GetWalletStatus();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+        /// <summary>
+        /// get all possesed symbols values
+        /// </summary>
+        /// <returns>list of available symbols with value</returns>
+        /// <see cref="https://binance-docs.github.io/apidocs/spot/en/#user-asset-user_data"/>
+
+        public async Task<List<Asset>> GetAssetsAsync()
+        {
+            try
+            {
+                return await BinanceController.GetAssets();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, ErrorFormatString);
+                throw;
+            }
+        }
+        #endregion
         #region "test"
         public async void DoSomethingAsync(string symbol, decimal? currentUnitPrice = null)
         {

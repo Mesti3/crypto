@@ -37,9 +37,8 @@ namespace Crypto
         {
             switch (ConfigurationManager.AppSettings.Get("Mode"))
             {
-                //case "Dummy":return new DummyBinanceController();
-                //case "Test": return new TestBinanceController(new ModelConverter(), GetKeyFromConfig(), GetSecretFromConfig());
-                //case "Real": return new BinanceController(new ModelConverter(), GetKeyFromConfig(), GetSecretFromConfig());
+                case "Dummy":return new DummyBinanceController();
+                case "Real": return new BinanceController(new ModelConverter(), GetKeyFromConfig(), GetSecretFromConfig());
                 case "GitHub": return new GitHubBinanceController(new ModelConverter(), GetKeyFromConfig(), GetSecretFromConfig());
                 default: throw new ArgumentOutOfRangeException("ConfigValue Mode");
             }

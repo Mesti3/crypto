@@ -97,5 +97,15 @@ namespace Crypto.Model
 
             };
         }
+
+        internal Asset BinanceUserBalanceToAsset(BinanceUserBalance data)
+        {
+            return new Asset()
+            {
+                Symbol = data.Asset,
+                Available = data.Available, 
+                Total = data.Total
+            };
+        }
     }
 }

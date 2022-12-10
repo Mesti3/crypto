@@ -149,37 +149,107 @@ namespace Crypto.BinanceControllers
                     }
             };
         }
-
-        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<OrderProfit>> GetAllOpenOrders(string symbol, long orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<object> DoSomething(string symbol, long orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<OrderProfit> GetOrder(string symbol, long orderId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<OrderProfit>> GetOrders(string symbol)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<SymbolSetting> GetSymbolSetting(string symbol)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
 
+
+        #region "GetOrders"
+        public async Task<OrderProfit> GetOrder(string symbol, long orderId)
+        {
+            return new OrderProfit()
+            {
+                ExternalOrderId = orderId,
+                Symbol = symbol,
+                Quantity = 5,
+                ActualUnitPrice = 1.02M,
+                ClientOrderId = "test0",
+                CreateTime = new DateTime(2022, 01, 01),
+                Id = 23,
+                TotalPrice = 5.1M,
+                UnitPrice = 1.025M
+            };
+        }
+        public async Task<List<OrderProfit>> GetOrders(string symbol)
+        {
+            return new List<OrderProfit>
+            {
+                new OrderProfit()
+                {
+                    ExternalOrderId = 12548,
+                    Symbol = symbol,
+                    Quantity = 5,
+                    ActualUnitPrice = 1.02M,
+                    ClientOrderId = "test0",
+                    CreateTime = new DateTime(2022, 01, 01),
+                    Id = 23,
+                    TotalPrice = 5.1M,
+                    UnitPrice = 1.025M
+                },
+                new OrderProfit()
+                {
+                    ExternalOrderId = 24821,
+                    Symbol = symbol,
+                    Quantity = 2,
+                    ActualUnitPrice = 1.01M,
+                    ClientOrderId = "test0",
+                    CreateTime = new DateTime(2022, 03, 01),
+                    Id = 24,
+                    TotalPrice = 2.02M,
+                    UnitPrice = 1.025M
+                }
+            };
+        }
+        #endregion
+        #region "Settings"
+        public async Task<SymbolSetting> GetSymbolSetting(string symbol)
+        {
+            return new SymbolSetting()
+            {
+                Symbol = symbol,
+                MinPrice = 1,
+                MaxPrice = 1000000,
+                PriceStep = 0.01M,
+                MinQuantity = 0.01M,
+                MaxQuantity = 1000000,
+                QuantityStep = 0.001M
+            };
+        }
+        #endregion
+        #region "Account"
+        public async Task<Asset> GetWalletStatus()
+        {
+            return new Asset()
+            {
+                Symbol = "EUR",
+                Available = 18.25M,
+                Total = 18.25M
+            };
+        }
+        public async Task<List<Asset>> GetAssets()
+        {
+            return new List<Asset>()
+            {
+                new Asset()
+                {
+                    Symbol = "EUR",
+                    Available = 18.25M,
+                    Total = 18.25M
+                },
+                new Asset()
+                {
+                    Symbol = "BTC",
+                    Available = 0.00125M,
+                    Total = 0.0125M
+                }
+            };
+        }
+        #endregion
+        #region "Other"
+        public async Task<object> DoSomething(string symbol, long orderId)
+        {
+
+                throw new NotImplementedException();
+            
+        }
+        #endregion
     }
 }

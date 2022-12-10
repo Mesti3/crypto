@@ -137,15 +137,26 @@ namespace Crypto.BinanceControllers
         }
         #endregion
         #region "Account"
-        public async Task<decimal> GetBalance()
+        public async Task<Asset> GetWalletStatus()
         {
             using (var client = new BinanceClient(BinanceClientOptions.Default))
             {
-                var result = await client.SpotApi.Account.GetBalancesAsync("USDT");
+                var result = await client.SpotApi.Account.GetBalancesAsync("USDT");//use EUR in real binance
                 if (result.Success)
-                    return result.Data.First().Available;// result.Data.Select(x => Converter.BinanceOrderToOrderProfit(x)).ToList();
+                    return Converter.BinanceUserBalanceToAsset(result.Data.First());
                 else
-                    throw new Exception("GetBalance: {}", new Exception(result.Error?.Message));
+                    throw new Exception("GetWalletStatus: {}", new Exception(result.Error?.Message));
+            }
+        }
+        public async Task<List<Asset>> GetAssets()
+        {
+            using (var client = new BinanceClient(BinanceClientOptions.Default))
+            {
+                var result = await client.SpotApi.Account.GetBalancesAsync();
+                if (result.Success)
+                    return result.Data.Select(x => Converter.BinanceUserBalanceToAsset(x)).ToList();
+                else
+                    throw new Exception("GetAssets: {}", new Exception(result.Error?.Message));
             }
         }
         #endregion
@@ -154,7 +165,8 @@ namespace Crypto.BinanceControllers
         {
             using (var client = new BinanceClient(BinanceClientOptions.Default))
             {
-                var result = await client.SpotApi.Account.GetUserAssetsAsync();
+               // var result = await client.SpotApi.Account.GetUserAssetsAsync();
+                var result = await client.SpotApi.Account.GetBalancesAsync();
                 if (result.Success)
                     return null;// result.Data.Select(x => Converter.BinanceOrderToOrderProfit(x)).ToList();
                 else

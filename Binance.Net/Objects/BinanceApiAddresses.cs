@@ -40,6 +40,7 @@
         /// </summary>
         public static BinanceApiAddresses Default = new BinanceApiAddresses
         {
+            //test
             RestClientAddress = "https://testnet.binance.vision",
             SocketClientAddress = "wss://testnet.binance.vision",
             BlvtSocketClientAddress = "wss://fstream.binancefuture.com",
@@ -48,6 +49,7 @@
             CoinFuturesRestClientAddress = "https://testnet.binancefuture.com",
             CoinFuturesSocketClientAddress = "wss://dstream.binancefuture.com",
             /*
+            //real
             RestClientAddress = "https://api.binance.com",
             SocketClientAddress = "wss://stream.binance.com:9443/",
             BlvtSocketClientAddress = "wss://nbstream.binance.com/lvt-p",
